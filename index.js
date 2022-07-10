@@ -26,6 +26,7 @@ class Sprite{   // Class for player (moving rectangle)
         }
         this.color = color;
         this.isAttacking;
+        this.health = 100;
     }
 
     draw(){
@@ -149,12 +150,16 @@ function animate(){
     if(rectangularCollision({rectangle1:player,rectangle2:enemy})
         && player.isAttacking){
         player.isAttacking = false;
-        console.log("Player Hit");
+        enemy.health-=20;
+        document.querySelector(".enemy-health-bar").style.width = enemy.health+'%';
+        // console.log("Player Hit");
     }
     if(rectangularCollision({rectangle1:enemy,rectangle2:player})
         && enemy.isAttacking){
         enemy.isAttacking = false;
-        console.log("Enemy Hit");
+        player.health-=20;
+        document.querySelector(".player-health-bar").style.width = player.health+'%';
+        // console.log("Enemy Hit");
     }
 }
 
