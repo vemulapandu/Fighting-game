@@ -95,7 +95,7 @@ const enemy = new Sprite({
     }
 })
 
-console.log(player);
+// console.log(player);
 
 const keys = {
     a:{
@@ -120,6 +120,34 @@ function rectangularCollision({rectangle1, rectangle2}){
         && rectangle1.attackBox.position.y <= rectangle2.position.y + rectangle2.height
     )
 }
+
+function determineWinner({player,enemy,timerId}){
+    clearTimeout(timerId);
+    document.querySelector('.result').style.display='flex';
+    if(player.health===enemy.health){
+        document.querySelector('.result').innerHTML="Tie";
+    }else if(player.health>enemy.health){
+        document.querySelector('.result').innerHTML="Player 1 Wins";
+    }else{
+        document.querySelector('.result').innerHTML="Player 2 Wins";
+    }
+}
+
+let timer=60;
+let timerId;
+function decreaseTimer(){
+    timerId = setTimeout(decreaseTimer,1000);
+    if(timer>0){
+        timer--;
+        document.querySelector('.timer').innerHTML=timer;
+    }
+
+    if(timer===0){
+        determineWinner({player,enemy,timerId});
+    }
+}
+
+decreaseTimer();
 
 function animate(){
     window.requestAnimationFrame(animate);    // which func we want to loop over and over again
@@ -160,6 +188,11 @@ function animate(){
         player.health-=20;
         document.querySelector(".player-health-bar").style.width = player.health+'%';
         // console.log("Enemy Hit");
+    }
+
+    //end game based on health
+    if(enemy.health<=0||player.health<=0){
+        determineWinner({player,enemy,timerId});
     }
 }
 
