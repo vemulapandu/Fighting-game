@@ -41,7 +41,17 @@ class Sprite{   // Class for player (moving rectangle)
 }
 
 class Player extends Sprite{   // Class for player (moving rectangle)
-    constructor({position, velocity, color = 'red', imageSrc, scale=1, framesMax=1, offset={x:0,y:0}, sprites}){
+    constructor({
+        position, 
+        velocity, 
+        color = 'red', 
+        imageSrc, 
+        scale=1, 
+        framesMax=1, 
+        offset={x:0,y:0}, 
+        sprites, 
+        attackBox = {offset: {}, width: undefined, height: undefined}
+    }){
         super({
             position,
             imageSrc,
@@ -58,9 +68,9 @@ class Player extends Sprite{   // Class for player (moving rectangle)
                 x: this.position.x,
                 y: this.position.y
             },
-            offset,
-            width: 100,
-            height: 50
+            offset: attackBox.offset,
+            width: attackBox.width,
+            height: attackBox.height
         }
         this.color = color;
         this.isAttacking;
@@ -69,6 +79,7 @@ class Player extends Sprite{   // Class for player (moving rectangle)
         this.framesElapsed=0;
         this.framesHold=5;
         this.sprites = sprites;
+        this.dead = false;
 
         for(const sprite in this.sprites){
             sprites[sprite].image = new Image();
@@ -78,10 +89,19 @@ class Player extends Sprite{   // Class for player (moving rectangle)
 
     update(){
         this.draw();
-        this.animateFrames();
+        if(!this.dead)this.animateFrames();
 
+        // attack boxes
         this.attackBox.position.x = this.position.x + this.attackBox.offset.x;
-        this.attackBox.position.y = this.position.y;
+        this.attackBox.position.y = this.position.y + this.attackBox.offset.y;
+
+        // Draw the attack box
+        // c.fillRect(
+        //     this.attackBox.position.x,
+        //     this.attackBox.position.y,
+        //     this.attackBox.width,
+        //     this.attackBox.height
+        // );
 
         this.position.x+=this.velocity.x;
         this.position.y+=this.velocity.y;
@@ -100,13 +120,35 @@ class Player extends Sprite{   // Class for player (moving rectangle)
     attack(){
         this.switchSprite('attack1');
         this.isAttacking = true;
-        setTimeout(()=>{
-            this.isAttacking = false;
-        },100)
+        // setTimeout(()=>{
+        //     this.isAttacking = false;
+        // },100)
+    }
+
+    takeHit(){
+        this.health-=20;
+        if(this.health<=0){
+            this.switchSprite('death');
+        }else{
+            this.switchSprite('takeHit');
+        }
     }
 
     switchSprite(sprite){
+        // overriding all other animations with death animation
+        if(this.image===this.sprites.death.image){
+            if(this.framerCurrent === this.sprites.death.framesMax-1){
+                this.dead=true;
+            }
+            return;
+        }
+
+        // overriding all other animations with attack animation
         if(this.image===this.sprites.attack1.image&&this.framerCurrent<this.sprites.attack1.framesMax-1)return;
+
+        // overriding when fighter gets hit
+        if(this.image===this.sprites.takeHit.image&&this.framerCurrent<this.sprites.takeHit.framesMax-1)return;
+
         switch(sprite){
             case'idle':
                 if(this.image!==this.sprites.idle.image){
@@ -140,6 +182,20 @@ class Player extends Sprite{   // Class for player (moving rectangle)
                 if(this.image!==this.sprites.attack1.image){
                     this.image = this.sprites.attack1.image;
                     this.framesMax=this.sprites.attack1.framesMax;
+                    this.framerCurrent=0;
+                }
+                break;
+            case'takeHit':
+                if(this.image!==this.sprites.takeHit.image){
+                    this.image = this.sprites.takeHit.image;
+                    this.framesMax=this.sprites.takeHit.framesMax;
+                    this.framerCurrent=0;
+                }
+                break;
+            case'death':
+                if(this.image!==this.sprites.death.image){
+                    this.image = this.sprites.death.image;
+                    this.framesMax=this.sprites.death.framesMax;
                     this.framerCurrent=0;
                 }
                 break;
