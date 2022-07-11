@@ -237,7 +237,7 @@ function animate(){
             width: player.health+'%'
         });
     }
-
+    
     //enemy misses
     if(enemy.isAttacking && enemy.framerCurrent===2){
         enemy.isAttacking = false;
