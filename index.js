@@ -165,6 +165,8 @@ function animate(){
     c.fillRect(0, 0, canvas.width, canvas.height);
     background.update();
     shop.update();
+    c.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    c.fillRect(0, 0, canvas.width, canvas.height);
     player.update();
     enemy.update();
 
@@ -212,8 +214,11 @@ function animate(){
         && player.isAttacking && player.framerCurrent===4){
         enemy.takeHit();
         player.isAttacking = false;
-        document.querySelector(".enemy-health-bar").style.width = enemy.health+'%';
+        // document.querySelector(".enemy-health-bar").style.width = enemy.health+'%';
         // console.log("Player Hit");
+        gsap.to('.enemy-health-bar',{
+            width: enemy.health+'%'
+        });
     }
 
     //player misses
@@ -226,8 +231,11 @@ function animate(){
         && enemy.isAttacking && enemy.framerCurrent===2){
         enemy.isAttacking = false;
         player.takeHit();
-        document.querySelector(".player-health-bar").style.width = player.health+'%';
+        // document.querySelector(".player-health-bar").style.width = player.health+'%';
         // console.log("Enemy Hit");
+        gsap.to('.player-health-bar',{
+            width: player.health+'%'
+        });
     }
 
     //enemy misses
@@ -252,7 +260,7 @@ window.addEventListener('keydown',(event)=>{
             case 'a': keys.a.pressed=true;
                 player.lastKey = 'a';
                 break;
-            case 'w': player.velocity.y=-20;
+            case 'w': if(player.position.y===330)player.velocity.y=-20;
                 break;
             case ' ': player.attack();
                 break;
@@ -266,13 +274,14 @@ window.addEventListener('keydown',(event)=>{
             case 'ArrowLeft':  keys.ArrowLeft.pressed = true;
                 enemy.lastKey = 'ArrowLeft';
                 break;
-            case 'ArrowUp': enemy.velocity.y=-20;
+            case 'ArrowUp': if(enemy.position.y===330)enemy.velocity.y=-20;
                 break;
             case 'ArrowDown': enemy.attack();
                 break;
         }
     }
     // console.log(event.key);
+    // console.log(player.position.y,enemy.position.y);
 });
 
 window.addEventListener('keyup',(event)=>{
